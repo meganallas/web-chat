@@ -15,6 +15,13 @@ Technologies:
 # Install project dependencies.
 npm install
 
+# Create environment variables file to store keys.
+touch .env.local
+
+# In the env file, add the following necessary keys without the square brackets:
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=[insert key string]
+CLERK_SECRET_KEY=[insert key string]
+
 # Run the developerment server.
 npm run dev
 ```
