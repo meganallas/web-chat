@@ -21,6 +21,8 @@ touch .env.local
 # In the env file, add the following necessary keys without the square brackets:
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=[insert key string]
 CLERK_SECRET_KEY=[insert key string]
+NEXT_PUBLIC_STREAM_KEY=[insert key string]
+STREAM_SECRET=[insert key string]
 
 # Run the developerment server.
 npm run dev
