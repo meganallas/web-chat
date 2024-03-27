@@ -8,13 +8,14 @@ import {
 
 interface MainChatboxProps {
   show: boolean;
+  hideChannelOnThread: boolean;
 }
 
-export default function MainChatbox({ show }: MainChatboxProps) {
+export default function MainChatbox({ show, hideChannelOnThread }: MainChatboxProps) {
   return (
     <div className={`h-full w-full ${show ? "block" : "hidden"}`}>
       <Channel>
-        <Window>
+        <Window hideOnThread={hideChannelOnThread}>
           <ChannelHeader />
           <MessageList />
           <MessageInput />
