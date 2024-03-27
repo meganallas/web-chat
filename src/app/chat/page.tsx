@@ -37,32 +37,34 @@ export default function ChatPage() {
 
   return (
     <>
-      <div className="h-screen">
-        <Chat client={chatClient}>
-          <div className="flex justify-center border-b border-b-[#f8f8f8] p-3 md:hidden">
-            <button onClick={() => setChatSidebarOpen(!chatSidebarOpen)}>
-              {!chatSidebarOpen ? (
-                <span className="flex items-center gap-1">
-                  <Menu />
-                  Menu
-                </span>
-              ) : (
-                <X />
-              )}
-            </button>
-          </div>
-          <div className="flex flex-row">
-            <ChatSidebar
-              user={user}
-              show={isLargeScreen || chatSidebarOpen}
-              onClose={handleSidebarOnClose}
-            />
-            <MainChatbox
-              show={isLargeScreen || !chatSidebarOpen}
-              hideChannelOnThread={!isLargeScreen}
-            />
-          </div>
-        </Chat>
+      <div className="h-screen bg-gray-100 xl:px-20 xl:py-8">
+        <div className="max-w-[1600px] min-w-[350px] h-full shadow-sm m-auto flex flex-col">
+          <Chat client={chatClient}>
+            <div className="flex justify-center border-b border-b-[#f8f8f8] p-3 md:hidden">
+              <button onClick={() => setChatSidebarOpen(!chatSidebarOpen)}>
+                {!chatSidebarOpen ? (
+                  <span className="flex items-center gap-1">
+                    <Menu />
+                    Menu
+                  </span>
+                ) : (
+                  <X />
+                )}
+              </button>
+            </div>
+            <div className="flex flex-row overflow-y-auto">
+              <ChatSidebar
+                user={user}
+                show={isLargeScreen || chatSidebarOpen}
+                onClose={handleSidebarOnClose}
+              />
+              <MainChatbox
+                show={isLargeScreen || !chatSidebarOpen}
+                hideChannelOnThread={!isLargeScreen}
+              />
+            </div>
+          </Chat>
+        </div>
       </div>
     </>
   );
