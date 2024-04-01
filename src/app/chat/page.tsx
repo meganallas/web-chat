@@ -41,6 +41,7 @@ export default function ChatPage() {
     <>
       <div className="h-screen bg-gray-100 xl:px-20 xl:py-8 text-black dark:bg-black dark:text-white">
         <div className="max-w-[1600px] min-w-[350px] h-full shadow-sm m-auto flex flex-col">
+          {/* TODO: Stream light/dark theme does not seem to be working specifically on the channel list hover/selected and chat bubble. */}
           <Chat
             client={chatClient}
             theme={
