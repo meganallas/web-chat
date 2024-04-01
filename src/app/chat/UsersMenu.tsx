@@ -9,6 +9,7 @@ import { Channel, UserResponse } from "stream-chat";
 import { ArrowLeft } from "lucide-react";
 import LoadingButton from "@/components/LoadingButton";
 import useDebounce from "../hooks/useDebounce";
+import Button from "@/components/Button";
 
 interface UsersMenuProps {
   loggedInUser: UserResource;
@@ -28,6 +29,8 @@ export default function UsersMenu({
   // User's profile image is not included in Stream's users response.
   const [users, setUsers] = useState<(UserResponse & { image?: string })[]>();
 
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+
   const [searchInput, setSearchInput] = useState("");
   const searchInputDebounced = useDebounce(searchInput);
 
@@ -43,7 +46,7 @@ export default function UsersMenu({
     async function loadInitialUsers() {
       setUsers(undefined);
       setEndOfPaginationReached(undefined);
-      
+
       // await new Promise((resolve) => setTimeout(resolve, 1000));
 
       try {
@@ -132,8 +135,22 @@ export default function UsersMenu({
     }
   };
 
+  const StartGroupChat = async (members: string[], name?: string) => {
+    try {
+      const channel = client.channel("messaging", {
+        members,
+        name,
+      });
+      await channel.create();
+      handleChannelSelected(channel);
+    } catch (error) {
+      console.error(error);
+      alert("Error creating channel");
+    }
+  };
+
   return (
-    <div className="absolute z-10 h-full w-full str-chat bg-white border-e border-e-[#DBDDE1]">
+    <div className="overflow-y-auto absolute z-10 h-full w-full str-chat bg-white border-e border-e-[#DBDDE1]">
       <div className="flex flex-col p-3">
         <div className="flex items-center gap-3 text-lg font-bold mb-3">
           <ArrowLeft onClick={onClose} className="cursor-pointer" /> Users
@@ -146,6 +163,14 @@ export default function UsersMenu({
           onChange={(event) => setSearchInput(event.target.value)}
         />
       </div>
+      {selectedUsers.length > 0 && (
+        <StartGroupChatHeader
+          onConfirm={(name) =>
+            StartGroupChat([loggedInUser.id, ...selectedUsers], name)
+          }
+          onClearSelection={() => setSelectedUsers([])}
+        />
+      )}
       <div>
         {users?.map((user) => (
           <UserResult
@@ -153,6 +178,14 @@ export default function UsersMenu({
             onUserClicked={() => {
               startChatWithUser;
             }}
+            selected={selectedUsers.includes(user.id)}
+            onChangeSelected={(selected) =>
+              setSelectedUsers(
+                selected
+                  ? [...selectedUsers, user.id]
+                  : selectedUsers.filter((userId) => userId !== user.id)
+              )
+            }
             key={user.id}
           />
         ))}
@@ -178,14 +211,28 @@ export default function UsersMenu({
 interface UserResultProps {
   user: UserResponse & { image?: string };
   onUserClicked: (userId: string) => void;
+  selected?: boolean;
+  onChangeSelected: (selected: boolean) => void;
 }
 
-function UserResult({ user, onUserClicked }: UserResultProps) {
+function UserResult({
+  user,
+  onUserClicked,
+  selected,
+  onChangeSelected,
+}: UserResultProps) {
   return (
     <button
       className="mb-3 w-full flex items-center p-2 gap-2 hover:bg-[#e9eaed]"
       onClick={() => onUserClicked(user.id)}
     >
+      <input
+        type="checkbox"
+        checked={selected}
+        onChange={(event) => onChangeSelected(event.target.checked)}
+        onClick={(event) => event.stopPropagation()}
+        className="mx-1 scale-125"
+      />
       <span>
         <Avatar image={user.image} name={user.name || user.id} size={40} />
       </span>
@@ -194,5 +241,39 @@ function UserResult({ user, onUserClicked }: UserResultProps) {
       </span>
       {user.online && <span className="text-sm text-green-500">Online</span>}
     </button>
+  );
+}
+
+interface StartGroupChatHeaderProps {
+  onConfirm: (name?: string) => void;
+  onClearSelection: () => void;
+}
+
+function StartGroupChatHeader({
+  onConfirm,
+  onClearSelection,
+}: StartGroupChatHeaderProps) {
+  const [groupChatNameInput, setGroupChatNameInput] = useState("");
+
+  return (
+    <div className="sticky top-0 z-10 flex flex-col gap-3 bg-white p-3 shadow-sm">
+      <input
+        placeholder="Group name"
+        className="rounded border border-gray-300 p-2"
+        value={groupChatNameInput}
+        onChange={(event) => setGroupChatNameInput(event.target.value)}
+      />
+      <div className="flex justify-center gap-2">
+        <Button onClick={() => onConfirm(groupChatNameInput)} className="py-2">
+          Start group chat
+        </Button>
+        <Button
+          onClick={onClearSelection}
+          className="bg-gray-400 active:bg-gray-500 py-2"
+        >
+          Clear selection
+        </Button>
+      </div>
+    </div>
   );
 }
