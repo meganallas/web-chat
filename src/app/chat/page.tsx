@@ -10,6 +10,7 @@ import { Menu, X } from "lucide-react";
 import useWindowSize from "../hooks/useWindowSize";
 import { mdBreakpoint } from "../utils/tailwind";
 import { useTheme } from "../ThemeProvider";
+import { registerServiceWorker } from "../utils/serviceWorker";
 
 export default function ChatPage() {
   const chatClient = useInitializeChatClient();
@@ -28,6 +29,18 @@ export default function ChatPage() {
   const handleSidebarOnClose = useCallback(() => {
     setChatSidebarOpen(false);
   }, []);
+
+  useEffect(() => {
+    async function setupServiceWorker() {
+      try {
+        await registerServiceWorker();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    setupServiceWorker();
+  }, [])
 
   if (!chatClient || !user) {
     return (
